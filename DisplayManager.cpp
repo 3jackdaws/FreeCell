@@ -121,29 +121,29 @@ void DisplayManager::Display()
     
 }
 
-void DisplayManager::Fill(char c)
+void DisplayManager::Fill(const wchar_t * fill)
 {
     for (int row = 0; row < BUFFER_HEIGHT; row++)
     {
         for (int col = 0; col<BUFFER_WIDTH; col++)
         {
-            _console_buffer[row][col] = c;
-			_char_info[row*BUFFER_WIDTH + col].Char.AsciiChar = c;
+            //_console_buffer[row][col] = c;
+			_char_info[row*BUFFER_WIDTH + col].Char.UnicodeChar = *fill;
         }
     }
     
 }
 
 
-void DisplayManager::Write(int row, int col, char w)
+void DisplayManager::Write(int row, int col, const wchar_t * fill)
 {
 	if (row >= BUFFER_HEIGHT || row < 0 || col >= BUFFER_WIDTH || col < 0)
 		throw Exception("Buffer out of bounds");
-    _console_buffer[row][col] = w;
-	_char_info[row*BUFFER_WIDTH + col].Char.AsciiChar = w;
+   // _console_buffer[row][col] = w;
+	_char_info[row*BUFFER_WIDTH + col].Char.UnicodeChar = *fill;
 }
 
-void DisplayManager::Rect(int startrow, int startcol, int width, int height, wchar_t fill)
+void DisplayManager::Rect(int startrow, int startcol, int width, int height, const wchar_t * fill)
 {
 	if (startrow+height >= BUFFER_HEIGHT || startrow < 0 || startcol+width >= BUFFER_WIDTH || startcol < 0)
 		throw Exception("Buffer out of bounds");
@@ -151,8 +151,8 @@ void DisplayManager::Rect(int startrow, int startcol, int width, int height, wch
     {
         for (int col = startcol; col<startcol+width; col++)
         {
-            _console_buffer[row][col] = fill;
-			_char_info[row*BUFFER_WIDTH + col].Char.AsciiChar = fill;
+            //_console_buffer[row][col] = fill;
+			_char_info[row*BUFFER_WIDTH + col].Char.UnicodeChar = *fill;
         }
     }
 }
@@ -175,31 +175,31 @@ void DisplayManager::Text(int startrow, int startcol, int max, const char string
 		throw Exception("Buffer out of bounds");
     for (int col = startcol, i = 0; col<startcol+max && i<strlen(string); col++, i++)
     {
-        _console_buffer[startrow][col] = string[i];
+        //_console_buffer[startrow][col] = string[i];
 		_char_info[startrow*BUFFER_WIDTH + col].Char.AsciiChar = string[i];
     }
 }
 
-void DisplayManager::Line(int startrow, int startcol, int length, char fill)
+void DisplayManager::Line(int startrow, int startcol, int length, const wchar_t * fill)
 {
 	if (startrow >= BUFFER_HEIGHT || startrow < 0 || startcol + length >= BUFFER_WIDTH || startcol < 0)
 		throw Exception("Buffer out of bounds");
     for (int i = startcol; i<startcol+length; i++)
     {
-        _console_buffer[startrow][i] = fill;
-		_char_info[startrow*BUFFER_WIDTH + i].Char.AsciiChar = fill;
+        //_console_buffer[startrow][i] = fill;
+		_char_info[startrow*BUFFER_WIDTH + i].Char.UnicodeChar = *fill;
     }
     
 }
 
-void DisplayManager::VertLine(int startrow, int startcol, int length, char fill)
+void DisplayManager::VertLine(int startrow, int startcol, int length, const wchar_t * fill)
 {
 	if (startrow + length >= BUFFER_HEIGHT || startrow < 0 || startcol >= BUFFER_WIDTH || startcol < 0)
 		throw Exception("Buffer out of bounds");
     for (int i = startrow; i<startrow+length+1; i++)
     {
-        _console_buffer[i][startcol] = fill;
-		_char_info[i*BUFFER_WIDTH + startcol].Char.AsciiChar = fill;
+       // _console_buffer[i][startcol] = fill;
+		_char_info[i*BUFFER_WIDTH + startcol].Char.UnicodeChar = *fill;
     }
     
 }
@@ -221,4 +221,25 @@ coords DisplayManager::ScanF(char * chars)
         }
     }
     return coords{-1,-1};
+}
+
+void DisplayManager::DrawSuit(int row, int col, Suit suit)
+{
+	wchar_t * n;
+	switch (suit)
+	{
+	case HEARTS:
+		n = L"H";
+		break;
+	case DIAMONDS:
+		n = L"D";
+		break;
+	case CLUBS:
+		n = L"C";
+		break;
+	case SPADES:
+		n = L"S";
+		break;
+	}
+	_char_info[row*BUFFER_WIDTH + col].Char.UnicodeChar = *n;
 }

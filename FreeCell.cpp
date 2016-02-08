@@ -40,8 +40,8 @@ void FreeCell::StartNewGame()
 void FreeCell::StartGameUI()
 {
     DisplayManager dm;
-	system("MODE CON COLS=101 LINES=40");
-    dm.Fill(' ');
+	/*system("MODE CON COLS=101 LINES=40");*/
+    dm.Fill(L" ");
     _board.DrawStatics(dm);
     
     Deal(dm);
@@ -73,7 +73,7 @@ void FreeCell::StartGameUI()
             case ' ':
                 _board.PickUpCard();
             default:
-				cout << (unsigned char)d << endl;
+				std::wcout << (unsigned char)d << endl;
         }
     }
 }
@@ -90,6 +90,6 @@ void FreeCell::Deal(DisplayManager & dm)
 void FreeCell::WriteError(DisplayManager & dm)
 {
     int size = _error_msg.length();
-    dm.Rect(BUFFER_HEIGHT-1, 0, size, 1, ' ');
+    dm.Rect(BUFFER_HEIGHT-1, 0, size, 1, L"\u0020");
     dm.Text(BUFFER_HEIGHT-1, 0, size+1, _error_msg.c_str());
 }

@@ -18,8 +18,14 @@ using std::endl;
 #include "GameBoard.hpp"
 #include "FreeCell.hpp"
 
+#include <io.h>
+#include <fcntl.h>
+
 
 int main(int argc, const char * argv[]) {
+	_setmode(_fileno(stdout), _O_U16TEXT);
+	setlocale(LC_ALL, "");
+	std::wcout << L"\u2666" << endl;
     FreeCell freecell;
     freecell.StartNewGame();
 	

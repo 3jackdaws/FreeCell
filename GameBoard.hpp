@@ -32,13 +32,13 @@ class GameBoard
     const int CARD_WIDTH = 10;
     const int CARD_HEIGHT = 8;
     const char CARD_BORDER = '.';
-    const wchar_t CARD_TOP = '-';
-    const wchar_t CARD_SIDES = '|';
-    const wchar_t CARD_TOPL = '.';
-    const wchar_t CARD_TOPR = '.';
-    const wchar_t CARD_BOTL = '.';
-    const wchar_t CARD_BOTR = '.';
-    const wchar_t SEL_CARD_BORDER = '*';
+    wchar_t * CARD_TOP = L"\u2550";
+    const wchar_t *CARD_SIDES = L"\u2551";
+    const wchar_t* CARD_TOPL = L"\u2554";
+    const wchar_t* CARD_TOPR = L"\u2557";
+    const wchar_t* CARD_BOTL = L"\u255A";
+    const wchar_t* CARD_BOTR = L"\u255D";
+    const wchar_t* SEL_CARD_BORDER = L"\u2551";
 public:
     GameBoard();
     GameBoard(const GameBoard & cp);
@@ -80,6 +80,8 @@ private:
     
     StackA<Card> _pickup_cards;
     int pickup_row;
+
+	bool _filled_hr[4];
 };
 
 #endif /* GameBoard_hpp */

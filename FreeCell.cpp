@@ -40,6 +40,7 @@ void FreeCell::StartNewGame()
 void FreeCell::StartGameUI()
 {
     DisplayManager dm;
+	system("MODE CON COLS=101 LINES=40");
     dm.Fill(' ');
     _board.DrawStatics(dm);
     
@@ -49,50 +50,31 @@ void FreeCell::StartGameUI()
     Card temp;
     int i = 0;
     
-    while(!_gameover)
+    while(true)
     {
         _board.Update(dm);
-        WriteError(dm);
+        //WriteError(dm);
         dm.Display();
-        std::getline(std::cin, choice);
-        switch(toupper(*choice.c_str()))
+		d = getch();
+        switch(d)
         {
-            case 'W':
+            case 'w':
                 _board.SelUp();
                 break;
-            case 'A':
+            case 'a':
                 _board.SelLeft();
                 break;
-            case 'S':
+            case 's':
                 _board.SelDown();
                 break;
-            case 'D':
+            case 'd':
                 _board.SelRight();
                 break;
             case ' ':
                 _board.PickUpCard();
-            default:;
+            default:
+				cout << (unsigned char)d << endl;
         }
-        
-        
-        //_board.SelRight();
-//        temp = _board.RemoveFromPlayArea(i%8);
-//        if(!_board.PutToFreeCells(i%4, temp))
-//        {
-//            _board.PutToPlayArea(i%8, temp);
-//            _error_msg = "That Free Cell is already full.";
-//        }
-//        _board.Update(dm);
-//        WriteError(dm);
-//        dm.Display();
-//
-//        temp = _board.RemoveFromPlayArea(6);
-//        if(!_board.PutToPlayArea(5, temp))
-//        {
-//            _board.ForceToPlayArea(6, temp);
-//            _error_msg = "That Card cannot go there.";
-//        }
-        //i++;
     }
 }
 

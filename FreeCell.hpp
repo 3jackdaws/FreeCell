@@ -15,6 +15,8 @@ using std::cout;
 using std::endl;
 #include "GameBoard.hpp"
 #include <string>
+#include <conio.h>
+
 
 class FreeCell
 {

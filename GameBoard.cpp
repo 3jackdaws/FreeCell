@@ -11,12 +11,12 @@
 GameBoard::GameBoard() : _freecells(4), _homecells(4), _playarea(8), _card_select(0)
 {
     
-    for (int i = 0; i<4; i++)
+    for (int i = 0; i<8; i++)
     {
         _dbit[_DBIT_FREECELL][i] = false;
         
     }
-    for (int i = 0; i<4; i++)
+    for (int i = 0; i<8; i++)
     {
         _dbit[_DBIT_HOMEROW][i] = false;
         
@@ -32,7 +32,8 @@ GameBoard::GameBoard() : _freecells(4), _homecells(4), _playarea(8), _card_selec
     }
     for (int i = 0; i<4; i++)
     {
-        _homecells[i].Resize(52);
+        _homecells[i].Resize(53);
+		_homecells[i].Push(Card(NULLSUIT, NULLRANK));
     }
     
     
@@ -132,11 +133,12 @@ void GameBoard::Update(DisplayManager & dm)
                 DrawSelectedCard(dm, TOP_MARGIN, LEFT_MARGIN+(row*CARD_WIDTH+row), _freecells[row]);
             else
                 DrawCard(dm, TOP_MARGIN, LEFT_MARGIN+(row*CARD_WIDTH+row), _freecells[row]);
+			if (_pickup_cards.Size() > 0 && _card_select == row)
+			{
+				DrawSelectedCard(dm, TOP_MARGIN, LEFT_MARGIN + (row*CARD_WIDTH + row), _pickup_cards.Peek());
+			}
         }
-        if(_pickup_cards.Size() > 0 && _card_select == row)
-        {
-            DrawSelectedCard(dm, TOP_MARGIN, LEFT_MARGIN+(row*CARD_WIDTH+row), _pickup_cards.Peek());
-        }
+        
     }
     //HOME CELLS UPDATE HERE
     for (int row = 0; row<4; row++)
@@ -148,11 +150,12 @@ void GameBoard::Update(DisplayManager & dm)
                 DrawSelectedCard(dm, TOP_MARGIN, LEFT_MARGIN+50+(row*CARD_WIDTH+row), _homecells[row].Peek());
             else
                 DrawCard(dm, TOP_MARGIN, LEFT_MARGIN+50+(row*CARD_WIDTH+row), _homecells[row].Peek());
+			if (_pickup_cards.Size() > 0 && _card_select == row + 4)
+			{
+				DrawSelectedCard(dm, TOP_MARGIN, LEFT_MARGIN + 50+(row*CARD_WIDTH + row), _pickup_cards.Peek());
+			}
         }
-        if(_pickup_cards.Size() > 0 && _card_select == row+4)
-        {
-            DrawSelectedCard(dm, TOP_MARGIN, LEFT_MARGIN+(row*CARD_WIDTH+row), _pickup_cards.Peek());
-        }
+        
     }
     //UPDATE PLAYAREA
     for (int row = 0; row<8; row++)
@@ -167,7 +170,7 @@ void GameBoard::Update(DisplayManager & dm)
             {
                 _dbit[_DBIT_PLAYAREA_FULL][row] = false;
                 number_to_update = _playarea[row].Size();
-                dm.Rect(TOP_MARGIN+ROW_MARGIN+CARD_HEIGHT, LEFT_MARGIN+(row*CARD_WIDTH+row), CARD_WIDTH, BUFFER_HEIGHT-CARD_HEIGHT-5, ' ');
+                dm.Rect(TOP_MARGIN+ROW_MARGIN+CARD_HEIGHT, LEFT_MARGIN+(row*CARD_WIDTH+row), CARD_WIDTH, BUFFER_HEIGHT-TOP_MARGIN-ROW_MARGIN-CARD_HEIGHT-1, ' ');
             }//if the whole stack needs to be updated
             else
             {
@@ -231,7 +234,9 @@ void GameBoard::DrawStatics(DisplayManager & dm)
 
 void GameBoard::DrawCard(DisplayManager & dm, int row, int col, Card & card)
 {
+	dm.ColorBackground(row, col, CARD_WIDTH, CARD_HEIGHT, 0x0007);
     dm.Rect(row, col, CARD_WIDTH, CARD_HEIGHT, ' ');
+	
     dm.Line(row, col+1, CARD_WIDTH-2, CARD_TOP);        //top edge
     dm.Line(row+CARD_HEIGHT-1, col+1, CARD_WIDTH-2, CARD_TOP);    //bottom edge
     dm.VertLine(row+1, col, CARD_HEIGHT-2, CARD_SIDES);
@@ -240,7 +245,7 @@ void GameBoard::DrawCard(DisplayManager & dm, int row, int col, Card & card)
     dm.Write(row, col+CARD_WIDTH-1, CARD_TOPR);
     dm.Write(row+CARD_HEIGHT-1, col, CARD_BOTL);
     dm.Write(row+CARD_HEIGHT-1, col+CARD_WIDTH-1, CARD_BOTR);
-    
+	
     if(card.Rank() != NULLRANK)
     {
         char abbrev[7] ={'\0'};
@@ -257,12 +262,12 @@ void GameBoard::DrawCard(DisplayManager & dm, int row, int col, Card & card)
         abbrev[3] = 'f';
         abbrev[4] = ' ';
         abbrev[5] = card.SuitText()[0];
-        dm.Text(row+1, col+2, col+CARD_WIDTH, abbrev);
-        dm.Text(row+TEXT_MARGIN, col+1, col+CARD_WIDTH, card.RankText());
-        dm.Text(row+TEXT_MARGIN+1, col+1, col+CARD_WIDTH, "of");
-        dm.Text(row+TEXT_MARGIN+2, col+1, col+CARD_WIDTH, card.SuitText());
+        dm.Text(row+1, col+2, CARD_WIDTH, abbrev);
+        dm.Text(row+TEXT_MARGIN, col+1, CARD_WIDTH, card.RankText());
+        dm.Text(row+TEXT_MARGIN+1, col+1, CARD_WIDTH, "of");
+        dm.Text(row+TEXT_MARGIN+2, col+1, CARD_WIDTH, card.SuitText());
     }
-    
+	
 }
 void GameBoard::ForceToPlayArea(int row, Card card)
 {
@@ -272,39 +277,8 @@ void GameBoard::ForceToPlayArea(int row, Card card)
 
 void GameBoard::DrawSelectedCard(DisplayManager & dm, int row, int col, Card & card)
 {
-    
-    dm.Rect(row, col, CARD_WIDTH, CARD_HEIGHT, ' ');
-    dm.Line(row, col+1, CARD_WIDTH-2, SEL_CARD_BORDER);        //top edge
-    dm.Line(row+CARD_HEIGHT-1, col+1, CARD_WIDTH-2, SEL_CARD_BORDER);    //bottom edge
-    dm.VertLine(row+1, col, CARD_HEIGHT-2, SEL_CARD_BORDER);
-    dm.VertLine(row+1, col+CARD_WIDTH-1, CARD_HEIGHT-2, SEL_CARD_BORDER);
-    dm.Write(row, col, CARD_TOPL);
-    dm.Write(row, col+CARD_WIDTH-1, CARD_TOPR);
-    dm.Write(row+CARD_HEIGHT-1, col, CARD_BOTL);
-    dm.Write(row+CARD_HEIGHT-1, col+CARD_WIDTH-1, CARD_BOTR);
-    
-    if(card.Rank() != NULLRANK)
-    {
-        char abbrev[7] ={'\0'};
-        if(card.Rank() == 0 || card.Rank()>8)
-        {
-            abbrev[0] = card.RankText()[0];
-        }
-        else
-        {
-            abbrev[0] = (char)(card.Rank()+0x31);
-        }
-        abbrev[1] = ' ';
-        abbrev[2] = 'o';
-        abbrev[3] = 'f';
-        abbrev[4] = ' ';
-        abbrev[5] = card.SuitText()[0];
-        dm.Text(row+1, col+2, col+CARD_WIDTH, abbrev);
-        dm.Text(row+TEXT_MARGIN, col+1, col+CARD_WIDTH, card.RankText());
-        dm.Text(row+TEXT_MARGIN+1, col+1, col+CARD_WIDTH, "of");
-        dm.Text(row+TEXT_MARGIN+2, col+1, col+CARD_WIDTH, card.SuitText());
-    }
-    
+	DrawCard(dm, row, col, card);
+	dm.ColorBackground(row, col, CARD_WIDTH, CARD_HEIGHT, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
 }
 
 void GameBoard::SelUp()
@@ -406,7 +380,7 @@ bool GameBoard::PickUpCard()
     }
     else if(_card_select < 8)
     {
-        
+        if(_pickup_cards)
     }
     else
     {

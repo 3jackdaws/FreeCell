@@ -18,8 +18,8 @@
 class DisplayManager;
 
 const unsigned short _DBIT_FREECELL = 0;
-const unsigned short _DBIT_PLAYAREA = 1;
-const unsigned short _DBIT_HOMEROW = 2;
+const unsigned short _DBIT_PLAYAREA = 2;
+const unsigned short _DBIT_HOMEROW = 1;
 const unsigned short _DBIT_PLAYAREA_FULL = 3;
 
 
@@ -32,13 +32,13 @@ class GameBoard
     const int CARD_WIDTH = 10;
     const int CARD_HEIGHT = 8;
     const char CARD_BORDER = '.';
-    const char CARD_TOP = '-';
-    const char CARD_SIDES = '|';
-    const char CARD_TOPL = '*';
-    const char CARD_TOPR = '*';
-    const char CARD_BOTL = '*';
-    const char CARD_BOTR = '*';
-    const char SEL_CARD_BORDER = '*';
+    const wchar_t CARD_TOP = '-';
+    const wchar_t CARD_SIDES = '|';
+    const wchar_t CARD_TOPL = '.';
+    const wchar_t CARD_TOPR = '.';
+    const wchar_t CARD_BOTL = '.';
+    const wchar_t CARD_BOTR = '.';
+    const wchar_t SEL_CARD_BORDER = '*';
 public:
     GameBoard();
     GameBoard(const GameBoard & cp);

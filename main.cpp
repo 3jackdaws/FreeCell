@@ -25,8 +25,9 @@ using std::endl;
 int main(int argc, const char * argv[]) {
 	_setmode(_fileno(stdout), _O_U16TEXT);
 	setlocale(LC_ALL, "");
-	std::wcout << L"\u2666" << endl;
-    FreeCell freecell;
+	system("MODE CON COLS=100 LINES=60");
+	//cout << (char)4 << endl;
+	FreeCell freecell(1);
     freecell.StartNewGame();
 	
     return 0;

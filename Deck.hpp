@@ -19,7 +19,7 @@ const unsigned short DECK_SIZE = 52;
 class Deck
 {
 public:
-    Deck(int size = DECK_SIZE, int seed = 1234567890);
+    Deck(int size = DECK_SIZE);
     Deck(const Deck & cp);
     ~Deck();
     Deck & operator = (const Deck & rhs);

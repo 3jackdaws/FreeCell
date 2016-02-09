@@ -50,12 +50,15 @@ public:
     Card RemoveFromHomeCells(int row);
     
     void ForceToPlayArea(int row, Card card);
+	void DebugPlaceCard();
     
     bool PutToPlayArea(int row, Card card);
     bool PutToFreeCells(int row, Card card);
     void PutToHomeCells(int row, Card card);
     
     void Update(DisplayManager & dm);
+	bool CheckWinCondition();
+	void SetWinCond(int);
     
     void DrawStatics(DisplayManager & dm);
     void DrawCard(DisplayManager & dm, int row, int col, Card & card);
@@ -81,7 +84,7 @@ private:
     StackA<Card> _pickup_cards;
     int pickup_row;
 
-	bool _filled_hr[4];
+	bool _homecell_filled[4];
 };
 
 #endif /* GameBoard_hpp */

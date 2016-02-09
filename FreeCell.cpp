@@ -8,9 +8,14 @@
 
 #include "FreeCell.hpp"
 
-FreeCell::FreeCell(int gamenumber) : _gameover(false), _deck(52, gamenumber)
+FreeCell::FreeCell(int gamenumber) : _gameover(false), _deck(52)
 {
-    
+	if (gamenumber == 1)
+	{
+
+	}
+	else
+		_deck.Init(gamenumber);
 }
 
 FreeCell::FreeCell(const FreeCell & cp)
@@ -50,7 +55,7 @@ void FreeCell::StartGameUI()
     Card temp;
     int i = 0;
     
-    while(true)
+    while(!_board.CheckWinCondition())
     {
         _board.Update(dm);
         //WriteError(dm);
@@ -72,10 +77,15 @@ void FreeCell::StartGameUI()
                 break;
             case ' ':
                 _board.PickUpCard();
-            default:
-				std::wcout << (unsigned char)d << endl;
+				break;
+			case 'f':
+				_board.DebugPlaceCard();
+				break;
+			default:;
+				//std::wcout << (unsigned char)d << endl;
         }
     }
+	std::wcout << "You've won!" << endl;
 }
 
 void FreeCell::Deal(DisplayManager & dm)

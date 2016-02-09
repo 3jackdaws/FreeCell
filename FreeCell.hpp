@@ -21,7 +21,7 @@ using std::endl;
 class FreeCell
 {
 public:
-    FreeCell(int gamenumber = 4777483);
+    FreeCell(int gamenumber = 99476635345443);
     FreeCell(const FreeCell & cp);
     ~FreeCell();
     FreeCell & operator = (const FreeCell & rhs);

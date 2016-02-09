@@ -10,8 +10,6 @@
 
 DisplayManager::DisplayManager()
 {
-	
-
 	mainRect.Top = 0;    // top left: row 0, col 0 
 	mainRect.Left = 0;
 	mainRect.Bottom = BUFFER_HEIGHT; // bot. right: row 1, col 79 
@@ -43,10 +41,10 @@ DisplayManager::DisplayManager()
 	coordBufSize,   // col-row size of chiBuffer 
 	coordBufCoord,  // top left dest. cell in chiBuffer 
 	&mainRect);
-	for (int i = 0; i<BUFFER_HEIGHT; i++)
+	/*for (int i = 0; i<BUFFER_HEIGHT; i++)
 	{
 		_console_buffer[i][BUFFER_WIDTH] = '\0';
-	}
+	}*/
 }
 
 DisplayManager::DisplayManager(const DisplayManager & cp)
@@ -64,7 +62,7 @@ DisplayManager & DisplayManager::operator = (const DisplayManager & rhs)
 
 void DisplayManager::Display()
 {
-	SetConsoleActiveScreenBuffer(_secondary_buffer);
+	//SetConsoleActiveScreenBuffer(_secondary_buffer);
 
 	//for (int row = 0; row <BUFFER_HEIGHT; row++)
 	//{
@@ -101,7 +99,7 @@ void DisplayManager::Display()
 	//secRect.Left = 0;
 	//secRect.Bottom = BUFFER_HEIGHT; // bot. rt: row 11, col 79 
 	//secRect.Right = BUFFER_WIDTH;
-
+	//SetConsoleActiveScreenBuffer(_main_buffer);
 	WriteConsoleOutput(
 		_main_buffer, // screen buffer to write to 
 		_char_info,        // buffer to copy from 
@@ -109,14 +107,14 @@ void DisplayManager::Display()
 		coordBufCoord,    // top left src cell in chiBuffer 
 		&secRect);
 
-	SetConsoleActiveScreenBuffer(_main_buffer);
+	
 
-	WriteConsoleOutput(
-		_secondary_buffer, // screen buffer to write to 
-		_char_info,        // buffer to copy from 
-		coordBufSize,     // col-row size of chiBuffer 
-		coordBufCoord,    // top left src cell in chiBuffer 
-		&secRect);
+	//WriteConsoleOutput(
+	//	_secondary_buffer, // screen buffer to write to 
+	//	_char_info,        // buffer to copy from 
+	//	coordBufSize,     // col-row size of chiBuffer 
+	//	coordBufCoord,    // top left src cell in chiBuffer 
+	//	&secRect);
     
     
 }
@@ -137,19 +135,19 @@ void DisplayManager::Fill(const wchar_t * fill)
 
 void DisplayManager::Write(int row, int col, const wchar_t * fill)
 {
-	if (row >= BUFFER_HEIGHT || row < 0 || col >= BUFFER_WIDTH || col < 0)
-		throw Exception("Buffer out of bounds");
-   // _console_buffer[row][col] = w;
-	_char_info[row*BUFFER_WIDTH + col].Char.UnicodeChar = *fill;
+	if (row >= BUFFER_HEIGHT || row < 0 || col >= BUFFER_WIDTH || col < 0);
+		//throw Exception("Buffer out of bounds");
+	else
+		_char_info[row*BUFFER_WIDTH + col].Char.UnicodeChar = *fill;
 }
 
 void DisplayManager::Rect(int startrow, int startcol, int width, int height, const wchar_t * fill)
 {
-	if (startrow+height >= BUFFER_HEIGHT || startrow < 0 || startcol+width >= BUFFER_WIDTH || startcol < 0)
-		throw Exception("Buffer out of bounds");
-    for (int row = startrow; row < height+startrow; row++)
+	/*if (startrow+height >= BUFFER_HEIGHT || startrow < 0 || startcol+width >= BUFFER_WIDTH || startcol < 0)
+		throw Exception("Buffer out of bounds");*/
+    for (int row = startrow; row < height+startrow && row < BUFFER_HEIGHT; row++)
     {
-        for (int col = startcol; col<startcol+width; col++)
+        for (int col = startcol; col<startcol+width && col<BUFFER_WIDTH; col++)
         {
             //_console_buffer[row][col] = fill;
 			_char_info[row*BUFFER_WIDTH + col].Char.UnicodeChar = *fill;
@@ -159,7 +157,7 @@ void DisplayManager::Rect(int startrow, int startcol, int width, int height, con
 
 void DisplayManager::ColorBackground(int startrow, int startcol, int width, int height, int color)
 {
-	for (int row = startrow; row < height + startrow; row++)
+	for (int row = startrow; row < height + startrow&& row < BUFFER_HEIGHT; row++)
 	{
 		for (int col = startcol; col < startcol + width; col++)
 		{
@@ -171,9 +169,9 @@ void DisplayManager::ColorBackground(int startrow, int startcol, int width, int 
 
 void DisplayManager::Text(int startrow, int startcol, int max, const char string[])
 {
-	if (startrow >= BUFFER_HEIGHT || startrow < 0 || startcol + max >= BUFFER_WIDTH || startcol < 0)
-		throw Exception("Buffer out of bounds");
-    for (int col = startcol, i = 0; col<startcol+max && i<strlen(string); col++, i++)
+	/*if (startrow >= BUFFER_HEIGHT || startrow < 0 || startcol + max >= BUFFER_WIDTH || startcol < 0)
+		throw Exception("Buffer out of bounds");*/
+    for (int col = startcol, i = 0; col<startcol+max && i<strlen(string) && col < BUFFER_WIDTH; col++, i++)
     {
         //_console_buffer[startrow][col] = string[i];
 		_char_info[startrow*BUFFER_WIDTH + col].Char.AsciiChar = string[i];
@@ -182,9 +180,9 @@ void DisplayManager::Text(int startrow, int startcol, int max, const char string
 
 void DisplayManager::Line(int startrow, int startcol, int length, const wchar_t * fill)
 {
-	if (startrow >= BUFFER_HEIGHT || startrow < 0 || startcol + length >= BUFFER_WIDTH || startcol < 0)
-		throw Exception("Buffer out of bounds");
-    for (int i = startcol; i<startcol+length; i++)
+	/*if (startrow >= BUFFER_HEIGHT || startrow < 0 || startcol + length >= BUFFER_WIDTH || startcol < 0)
+		throw Exception("Buffer out of bounds");*/
+    for (int i = startcol; i<startcol+length&& i < BUFFER_WIDTH; i++)
     {
         //_console_buffer[startrow][i] = fill;
 		_char_info[startrow*BUFFER_WIDTH + i].Char.UnicodeChar = *fill;
@@ -194,9 +192,9 @@ void DisplayManager::Line(int startrow, int startcol, int length, const wchar_t 
 
 void DisplayManager::VertLine(int startrow, int startcol, int length, const wchar_t * fill)
 {
-	if (startrow + length >= BUFFER_HEIGHT || startrow < 0 || startcol >= BUFFER_WIDTH || startcol < 0)
-		throw Exception("Buffer out of bounds");
-    for (int i = startrow; i<startrow+length+1; i++)
+	/*if (startrow + length >= BUFFER_HEIGHT || startrow < 0 || startcol >= BUFFER_WIDTH || startcol < 0)
+		throw Exception("Buffer out of bounds");*/
+    for (int i = startrow; i<startrow+length+1 && i < BUFFER_HEIGHT; i++)
     {
        // _console_buffer[i][startcol] = fill;
 		_char_info[i*BUFFER_WIDTH + startcol].Char.UnicodeChar = *fill;
@@ -225,7 +223,7 @@ coords DisplayManager::ScanF(char * chars)
 
 void DisplayManager::DrawSuit(int row, int col, Suit suit)
 {
-	wchar_t * n;
+	wchar_t * n = L" ";
 	switch (suit)
 	{
 	case HEARTS:

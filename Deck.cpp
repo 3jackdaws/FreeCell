@@ -8,9 +8,16 @@
 
 #include "Deck.hpp"
 
-Deck::Deck(int size, int seed) : _deck(size), _size(DECK_SIZE), _top_of_deck(0)
+Deck::Deck(int size) : _deck(size), _size(DECK_SIZE), _top_of_deck(0)
 {
-    Init(seed);
+	//IDGAF about your deck size
+	for (int rank = 0; rank < 13; rank++)
+	{
+		for (int suit = 0; suit < 4; suit++)
+		{
+			_deck[DECK_SIZE-1 - ((suit * 13) + rank)] = Card((Suit)suit, (Rank)rank);
+		}
+	}
 }
 
 Deck::Deck(const Deck & cp) : _deck(cp._deck), _size(cp._size), _top_of_deck(cp._top_of_deck)
@@ -45,13 +52,7 @@ Card Deck::Draw()
 void Deck::Init(int seed)
 {
     srand(seed);
-    for (int rank = 0; rank < 13; rank++)
-    {
-        for (int suit = 0; suit < 4; suit++)
-        {
-            _deck[(suit*13)+rank] = Card((Suit)suit, (Rank)rank);
-        }
-    }
+    
     int rnum = 0;
     for (int i = 0; i<DECK_SIZE; i++)
     {

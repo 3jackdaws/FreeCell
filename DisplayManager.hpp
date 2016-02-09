@@ -15,7 +15,7 @@
 using timepoint = std::chrono::high_resolution_clock::time_point;
 #include <Windows.h>
 const int BUFFER_WIDTH = 100;
-const int BUFFER_HEIGHT= 40;
+const int BUFFER_HEIGHT= 60;
 
 struct coords{
     int row;
@@ -25,8 +25,7 @@ class DisplayManager
 {
 
 
-	static const int BUFFER_WIDTH = 100;
-	static const int BUFFER_HEIGHT = 40;
+	
 public:
 	DisplayManager();
 	DisplayManager(const DisplayManager & cp);

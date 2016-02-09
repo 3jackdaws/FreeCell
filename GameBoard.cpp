@@ -32,9 +32,9 @@ GameBoard::GameBoard() : _freecells(4), _homecells(4), _playarea(8), _card_selec
     }
     for (int i = 0; i<4; i++)
     {
-        _homecells[i].Resize(53);
+        _homecells[i].Resize(14);
 		_homecells[i].Push(Card(NULLSUIT, NULLRANK));
-		_filled_hr[i] = false;
+		_homecell_filled[i] = false;
     }
     
     
@@ -147,6 +147,7 @@ void GameBoard::Update(DisplayManager & dm)
         if(_dbit[_DBIT_HOMEROW][row])
         {
             _dbit[_DBIT_HOMEROW][row] = false;
+			SetWinCond(row);
             if(_card_select == row+4)
                 DrawSelectedCard(dm, TOP_MARGIN, LEFT_MARGIN+50+(row*CARD_WIDTH+row), _homecells[row].Peek());
             else
@@ -171,7 +172,7 @@ void GameBoard::Update(DisplayManager & dm)
             {
                 _dbit[_DBIT_PLAYAREA_FULL][row] = false;
                 number_to_update = _playarea[row].Size();
-                dm.Rect(TOP_MARGIN+ROW_MARGIN+CARD_HEIGHT, LEFT_MARGIN+(row*CARD_WIDTH+row), CARD_WIDTH, BUFFER_HEIGHT-TOP_MARGIN-ROW_MARGIN-CARD_HEIGHT-1, L" ");
+                dm.Rect(TOP_MARGIN+ROW_MARGIN+CARD_HEIGHT, LEFT_MARGIN+(row*CARD_WIDTH+row), CARD_WIDTH, BUFFER_HEIGHT-TOP_MARGIN-ROW_MARGIN, L" ");
             }//if the whole stack needs to be updated
             else
             {
@@ -192,6 +193,17 @@ void GameBoard::Update(DisplayManager & dm)
                     DrawCard(dm, TOP_MARGIN+ROW_MARGIN+CARD_HEIGHT+2*i, LEFT_MARGIN+(row*CARD_WIDTH+row), temp);
                 _playarea[row].Push(temp);
             }
+			if (_playarea[row].Size() == 0)
+			{
+				if (_card_select > 7 && _card_select % 8 == row)
+				{
+					DrawSelectedCard(dm, TOP_MARGIN + ROW_MARGIN + CARD_HEIGHT, LEFT_MARGIN + (row*CARD_WIDTH + row), Card(NULLSUIT, NULLRANK));
+				}
+				else
+				{
+					DrawCard(dm, TOP_MARGIN + ROW_MARGIN + CARD_HEIGHT, LEFT_MARGIN + (row*CARD_WIDTH + row), Card(NULLSUIT, NULLRANK));
+				}
+			}
             if(_pickup_cards.Size()>0 && _card_select>7 &&_card_select%8 == row)
             {
                 StackA<Card> temps(_pickup_cards.Size());
@@ -208,6 +220,7 @@ void GameBoard::Update(DisplayManager & dm)
                     _pickup_cards.Push(temps.Pop());
                 }
             }
+			
         }
     }
     //UPDATE SELECTED CARD
@@ -310,7 +323,8 @@ void GameBoard::SelDown()
     int t2 = _playarea[_card_select%8].Size()*8;
     int t3 = _card_select+8;
     int row = _card_select%8;
-    if((_card_select<8 && _playarea[_card_select%8].Size()>0) || _playarea[row].Size()*8+row>=_card_select+8)
+	/*if((_card_select<8 && _playarea[_card_select%8].Size()>0) || _playarea[row].Size()*8+row>=_card_select+8)*/
+	if (_card_select<8  || _playarea[row].Size() * 8 + row >= _card_select + 8)
     {
         Notify();
         _card_select+=8;
@@ -325,8 +339,13 @@ void GameBoard::SelLeft()
         Notify();
         _card_select--;
         Notify();
-        if(_playarea[row-1].Size()*8+row-1 < _card_select)
-            _card_select = _playarea[row-1].Size()*8+row-1;
+		if (_card_select > 7)
+		{
+			if (_playarea[row - 1].Size() * 8 + row - 1 < _card_select)
+				_card_select = _playarea[row - 1].Size() * 8 + row - 1;
+			if (_playarea[row - 1].Size() == 0)
+				_card_select = row + 7;
+		}
     }
     
 }
@@ -338,8 +357,14 @@ void GameBoard::SelRight()
         Notify();
         _card_select++;
         Notify();
-        if(_playarea[row+1].Size()*8+row+1 < _card_select-1)
-            _card_select = _playarea[row+1].Size()*8+row+1;
+		if (_card_select > 7)
+		{
+			if (_playarea[row + 1].Size() * 8 + row + 1 < _card_select - 1)
+				_card_select = _playarea[row + 1].Size() * 8 + row + 1;
+			if (_playarea[row + 1].Size() == 0)
+				_card_select = row + 9;
+		}
+        
     }
     
 }
@@ -435,16 +460,29 @@ bool GameBoard::PickUpCard()
         }
         else
         {
-            Card top = _playarea[row].Peek();
-            Card card = _pickup_cards.Peek();
-            if(row == pickup_row || (top.Suit()%2 == (card.Suit()+1)%2 && top.Rank() == card.Rank() + 1))
-            {
-                int size_of_stack = _pickup_cards.Size();
-                for (int i = 0; i<size_of_stack; i++)
-                {
-                    _playarea[row].Push(_pickup_cards.Pop());
-                }
-            }
+			//CALC NUMBER OF MOVES
+			int num_moves = 1, num_open_playarea = 0;
+			for (int i = 0; i < 4; i++)
+			{
+				if (_freecells[i].Suit() == NULLSUIT)
+					num_moves++;
+			}
+			for (int i = 0; i < 8; i++)
+			{
+				if (_playarea[i].Size() == 0)
+					num_open_playarea++;
+			}
+			num_moves = num_moves * pow(2, num_open_playarea);
+			//What is going on here?  I've long since lost track.
+			//Basically, this is when the user is allowed to put a card back down in the playcells
+			if (row == pickup_row || (num_moves >= _pickup_cards.Size() && ( _playarea[row].Size() == 0 || (Card(_playarea[row].Peek()).Suit() % 2 == (_pickup_cards.Peek().Suit() + 1) % 2 && Card(_playarea[row].Peek()).Rank() == _pickup_cards.Peek().Rank() + 1))))
+			{
+				int size_of_stack = _pickup_cards.Size();
+				for (int i = 0; i<size_of_stack; i++)
+				{
+					_playarea[row].Push(_pickup_cards.Pop());
+				}
+			}
         }
     }
    
@@ -455,4 +493,39 @@ bool GameBoard::PickUpCard()
         rval = true;
     }
     return rval;
+}
+
+void GameBoard::DebugPlaceCard()
+{
+	int row = _card_select % 8;
+	if (_pickup_cards.Size() == 0)
+	{
+		_pickup_cards.Resize(1);
+		_pickup_cards.Push(_playarea[row].Pop());
+	}
+	else
+	{
+		_playarea[row].Push(_pickup_cards.Pop());
+	}
+}
+
+void GameBoard::SetWinCond(int row)
+{
+	if (_homecells[row].Size() == 14)	//full suit and empty card
+	{
+		_homecell_filled[row] = true;
+	}
+}
+
+bool GameBoard::CheckWinCondition()
+{
+	if (_homecell_filled[0] && 
+		_homecell_filled[1] && 
+		_homecell_filled[2] && 
+		_homecell_filled[3])
+	{
+		return true;
+	}
+	return false;
+
 }

@@ -139,6 +139,7 @@ void DisplayManager::Write(int row, int col, const wchar_t * fill)
 		//throw Exception("Buffer out of bounds");
 	else
 		_char_info[row*BUFFER_WIDTH + col].Char.UnicodeChar = *fill;
+		//_char_info[i*BUFFER_WIDTH + startcol].Char.UnicodeChar = *fill;
 }
 
 void DisplayManager::Rect(int startrow, int startcol, int width, int height, const wchar_t * fill)
@@ -221,23 +222,3 @@ coords DisplayManager::ScanF(char * chars)
     return coords{-1,-1};
 }
 
-void DisplayManager::DrawSuit(int row, int col, Suit suit)
-{
-	wchar_t * n = L" ";
-	switch (suit)
-	{
-	case HEARTS:
-		n = L"H";
-		break;
-	case DIAMONDS:
-		n = L"D";
-		break;
-	case CLUBS:
-		n = L"C";
-		break;
-	case SPADES:
-		n = L"S";
-		break;
-	}
-	_char_info[row*BUFFER_WIDTH + col].Char.UnicodeChar = *n;
-}

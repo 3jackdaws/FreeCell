@@ -12,6 +12,8 @@
 
 
 #include <stdio.h>
+#include <windows.h>
+#include <conio.h>
 #include "Deck.hpp"
 #include "StackL.h"
 #include "DisplayManager.hpp"
@@ -39,6 +41,7 @@ class GameBoard
     const wchar_t* CARD_BOTL = L"\u255A";
     const wchar_t* CARD_BOTR = L"\u255D";
     const wchar_t* SEL_CARD_BORDER = L"\u2551";
+	
 public:
     GameBoard();
     GameBoard(const GameBoard & cp);
@@ -59,8 +62,12 @@ public:
     void Update(DisplayManager & dm);
 	bool CheckWinCondition();
 	void SetWinCond(int);
+	bool QuitGamePrompt(DisplayManager & dm);
+	void WinSplash(DisplayManager & dm);
+	void RefreshAll();
     
     void DrawStatics(DisplayManager & dm);
+	void DrawSuit(DisplayManager & dm, int, int, Suit);
     void DrawCard(DisplayManager & dm, int row, int col, Card & card);
     void DrawSelectedCard(DisplayManager & dm, int row, int col, Card & card);
     

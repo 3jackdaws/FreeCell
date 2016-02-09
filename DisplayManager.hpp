@@ -14,6 +14,8 @@
 #include <chrono>
 using timepoint = std::chrono::high_resolution_clock::time_point;
 #include <Windows.h>
+#include <conio.h>
+#include <stdio.h>
 const int BUFFER_WIDTH = 100;
 const int BUFFER_HEIGHT= 60;
 
@@ -23,9 +25,6 @@ struct coords{
 };
 class DisplayManager
 {
-
-
-	
 public:
 	DisplayManager();
 	DisplayManager(const DisplayManager & cp);
@@ -40,8 +39,9 @@ public:
 	void Text(int startrow, int startcol, int max, const char string[]);
 	void Line(int startrow, int startcol, int length, const wchar_t * fill);
 	void VertLine(int startrow, int startcol, int length, const wchar_t * fill);
-	void DrawSuit(int, int, Suit suit);
+	
 	coords ScanF(char * chars);
+	
 private:
 	char _console_buffer[BUFFER_HEIGHT][BUFFER_WIDTH + 1];
 	HANDLE _main_buffer;

@@ -10,12 +10,18 @@
 
 FreeCell::FreeCell(int gamenumber) : _gameover(false), _deck(52)
 {
-	if (gamenumber == 1)
+	switch (gamenumber)
 	{
-
-	}
-	else
+	case 1:
+		break;
+	case 2:
+		_deck.Init(1234);
+		break;
+	default:
 		_deck.Init(gamenumber);
+	}
+	
+	
 }
 
 FreeCell::FreeCell(const FreeCell & cp)
@@ -54,8 +60,9 @@ void FreeCell::StartGameUI()
     std::string choice;
     Card temp;
     int i = 0;
+	bool quit = false;
     
-    while(!_board.CheckWinCondition())
+    while(!_board.CheckWinCondition() && !quit)
     {
         _board.Update(dm);
         //WriteError(dm);
@@ -81,11 +88,19 @@ void FreeCell::StartGameUI()
 			case 'f':
 				_board.DebugPlaceCard();
 				break;
+			case 'q':
+				quit = _board.QuitGamePrompt(dm);
+				break;
 			default:;
 				//std::wcout << (unsigned char)d << endl;
         }
     }
-	std::wcout << "You've won!" << endl;
+	if (!quit)
+	{
+		_board.WinSplash(dm);
+		dm.Display();
+	}
+	
 }
 
 void FreeCell::Deal(DisplayManager & dm)

@@ -20,15 +20,30 @@ using std::endl;
 
 #include <io.h>
 #include <fcntl.h>
-
+#define _CRTDBG_MAP_ALLOC
 
 int main(int argc, const char * argv[]) {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	_setmode(_fileno(stdout), _O_U16TEXT);
 	setlocale(LC_ALL, "");
+	//SetConsoleCP(CP_UTF8);
+	//std::wcout << L"\u2666" << endl;
 	system("MODE CON COLS=100 LINES=60");
-	//cout << (char)4 << endl;
-	FreeCell freecell(1);
-    freecell.StartNewGame();
+	std::string input;
+	int rand_gamenumber = 0;
+	while(toupper(input.c_str()[0]) != 'Q')
+	{
+		system("cls");
+		std::wcout << "Enter gamenumber or leave empty for random game.\nReserved Gamenumbers: \n\t1 - Deal Unshuffled Deck\n\t2 - Easy" << endl;
+		std::getline(std::cin, input);
+		if (toupper(input.c_str()[0]) != 'Q')
+		{
+			FreeCell freecell(atoi(input.c_str()));
+			freecell.StartNewGame();
+		}
+		
+	}
+
 	
     return 0;
 }

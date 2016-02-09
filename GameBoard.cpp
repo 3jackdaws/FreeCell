@@ -244,6 +244,8 @@ void GameBoard::DrawStatics(DisplayManager & dm)
     dm.Text(TOP_MARGIN+CARD_HEIGHT, start+LEFT_MARGIN, 12, free_cell_text);
     dm.Text(TOP_MARGIN+CARD_HEIGHT, start+LEFT_MARGIN+50, 12, home_row_text);
     dm.Text(TOP_MARGIN+CARD_HEIGHT+ROW_MARGIN-1, 45, 12, play_area_text);
+	dm.Text(0, 0, 100, "Use W/A/S/D to move, SPACE to select a card or stack to pickup, and SPACE to place a card or stack.");
+	dm.Text(1, 0, 100, "Q will quit the game.  Use F to force place a card on any stack.  THIS WILL BREAK THE GAME.");
 }
 
 void GameBoard::DrawCard(DisplayManager & dm, int row, int col, Card & card)
@@ -275,8 +277,8 @@ void GameBoard::DrawCard(DisplayManager & dm, int row, int col, Card & card)
         abbrev[2] = 'o';
         abbrev[3] = 'f';
         abbrev[4] = ' ';
-		dm.DrawSuit( row+1, col+7, card.Suit());
-        abbrev[5] = card.SuitText()[0];
+		DrawSuit(dm, row+1, col+7, card.Suit());
+        //abbrev[5] = card.SuitText()[0];
 		int color = 0x0007;
 		if (card.Suit() % 2 == 0)
 			color = FOREGROUND_RED;
@@ -298,7 +300,12 @@ void GameBoard::ForceToPlayArea(int row, Card card)
 void GameBoard::DrawSelectedCard(DisplayManager & dm, int row, int col, Card & card)
 {
 	DrawCard(dm, row, col, card);
-	dm.ColorBackground(row, col, CARD_WIDTH, CARD_HEIGHT, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+	dm.ColorBackground(row, col, CARD_WIDTH, 1, FOREGROUND_GREEN | FOREGROUND_INTENSITY);//top
+	dm.ColorBackground(row, col, 1, CARD_HEIGHT, FOREGROUND_GREEN | FOREGROUND_INTENSITY);//left
+	dm.ColorBackground(row+CARD_HEIGHT-1, col, CARD_WIDTH, 1, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+	dm.ColorBackground(row, col+CARD_WIDTH-1, 1, CARD_HEIGHT-1, FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+	//dm.ColorBackground(row+1, col+1, CARD_WIDTH-2, CARD_HEIGHT-2, FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY);
+	
 }
 
 void GameBoard::SelUp()
@@ -397,6 +404,7 @@ bool GameBoard::PickUpCard()
             if(_freecells[row].Rank() == NULLRANK)     //if A card is picked up and the cell is empty
             {
                 _freecells[row] = _pickup_cards.Pop();
+				pickup_row = -1;
                 _dbit[_DBIT_FREECELL][row] = true;
             }
             
@@ -517,6 +525,55 @@ void GameBoard::SetWinCond(int row)
 	}
 }
 
+bool GameBoard::QuitGamePrompt(DisplayManager & dm)
+{
+	dm.Rect(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, 20, 10, L" ");
+	dm.Line(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, 20, CARD_TOP);
+	dm.Line(BUFFER_HEIGHT + 0 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, 20, CARD_TOP);
+	dm.VertLine(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, 10, CARD_SIDES);
+	dm.VertLine(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH + 10 - BUFFER_WIDTH / 2, 10, CARD_SIDES);
+	
+	dm.Write(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, CARD_TOPL);
+	dm.Write(BUFFER_HEIGHT + 0 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, CARD_BOTL);
+	dm.Write(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH + 10 - BUFFER_WIDTH / 2, CARD_TOPR);
+	dm.Write(BUFFER_HEIGHT + 0 - BUFFER_HEIGHT / 2, BUFFER_WIDTH + 10 - BUFFER_WIDTH / 2, CARD_BOTR);
+	dm.Text(BUFFER_HEIGHT - 7 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 5 - BUFFER_WIDTH / 2, 12, "Quit Game?");
+	dm.Text(BUFFER_HEIGHT - 5 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 5 - BUFFER_WIDTH / 2, 12, "Yes    No");
+	int choice = 0;
+	char d = '\0';
+	while (d != 1)
+	{
+		dm.ColorBackground(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, 22, 20, 0x0007);
+		if (choice == 1)
+		{
+			dm.ColorBackground(BUFFER_HEIGHT - 5 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 5 - BUFFER_WIDTH / 2, 3, 1, BACKGROUND_BLUE | 0x0007);
+		}
+		else
+		{
+			dm.ColorBackground(BUFFER_HEIGHT - 5 - BUFFER_HEIGHT / 2, BUFFER_WIDTH + 2 - BUFFER_WIDTH / 2, 2, 1, BACKGROUND_BLUE | 0x0007);
+		}
+		dm.Display();
+		d = getch();
+		switch (d)
+		{
+		case 'a':
+			++choice %= 2;
+			break;
+		case 'd':
+			++choice %= 2;
+			break;
+		case ' ':
+			d = 1;
+		default:;
+		}
+	}
+	if (choice == 1)
+		return true;
+	RefreshAll();
+	dm.Rect(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, 22, 22, L" ");
+	return false;
+}
+
 bool GameBoard::CheckWinCondition()
 {
 	if (_homecell_filled[0] && 
@@ -528,4 +585,51 @@ bool GameBoard::CheckWinCondition()
 	}
 	return false;
 
+}
+
+void GameBoard::RefreshAll()
+{
+	for (int i = 0; i < 8; i++)
+	{
+		_dbit[_DBIT_PLAYAREA_FULL][i] = true;
+		_dbit[_DBIT_PLAYAREA][i] = true;
+	}
+}
+
+void GameBoard::DrawSuit(DisplayManager & dm, int row, int col, Suit suit)
+{
+
+
+	switch (suit)
+	{
+	case HEARTS:
+		dm.Write(row, col, L"\u2665");
+		break;
+	case DIAMONDS:
+		dm.Write(row, col, L"\u2666");
+		break;
+	case CLUBS:
+		dm.Write(row, col, L"\u2663");
+		break;
+	case SPADES:
+		dm.Write(row, col, L"\u2660");
+		break;
+	}
+
+}
+
+void GameBoard::WinSplash(DisplayManager & dm)
+{
+	dm.Rect(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, 20, 10, L" ");
+	dm.Line(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, 20, CARD_TOP);
+	dm.Line(BUFFER_HEIGHT + 0 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, 20, CARD_TOP);
+	dm.VertLine(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, 10, CARD_SIDES);
+	dm.VertLine(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH + 10 - BUFFER_WIDTH / 2, 10, CARD_SIDES);
+
+	dm.Write(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, CARD_TOPL);
+	dm.Write(BUFFER_HEIGHT + 0 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, CARD_BOTL);
+	dm.Write(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH + 10 - BUFFER_WIDTH / 2, CARD_TOPR);
+	dm.Write(BUFFER_HEIGHT + 0 - BUFFER_HEIGHT / 2, BUFFER_WIDTH + 10 - BUFFER_WIDTH / 2, CARD_BOTR);
+	dm.Text(BUFFER_HEIGHT - 7 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 8 - BUFFER_WIDTH / 2, 16, "Congratulations!");
+	dm.ColorBackground(BUFFER_HEIGHT - 10 - BUFFER_HEIGHT / 2, BUFFER_WIDTH - 10 - BUFFER_WIDTH / 2, 21, 10, 0x000F);
 }

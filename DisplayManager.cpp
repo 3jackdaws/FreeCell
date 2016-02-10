@@ -18,7 +18,7 @@
 *      creates a charinfo array of appropriate length and initializes the required data members
 *
 ************************************************************************/
-DisplayManager::DisplayManager()
+DisplayManager::DisplayManager()	//please don't rail me for not doing base member initialization for all these, I don't actually know how this Windows console black magic works
 {
 	mainRect.Top = 0;     
 	mainRect.Left = 0;
@@ -270,6 +270,20 @@ void DisplayManager::Line(int startrow, int startcol, int length, const wchar_t 
     
 }
 
+/**********************************************************************
+* Purpose: Draws a vertical line to the display buffer
+*
+* Precondition:
+*     none
+*
+* Postcondition:
+*		this method will draw the requested vertical line to the buffer
+
+IF THE INPUT IS NOT VALID, THE METHOD WILL WRITE UP TO THE INVALID BOUNDS.
+For example, if a rectangle is to be drawn that escapes the bounds of the display buffer, the portion that
+is outside the bounds will not be drawn.  This is not undefined behavior, I just defined it.
+*
+************************************************************************/
 void DisplayManager::VertLine(int startrow, int startcol, int length, const wchar_t * fill)
 {
 	/*if (startrow + length >= BUFFER_HEIGHT || startrow < 0 || startcol >= BUFFER_WIDTH || startcol < 0)
@@ -282,22 +296,5 @@ void DisplayManager::VertLine(int startrow, int startcol, int length, const wcha
     
 }
 
-coords DisplayManager::ScanF(char * chars)
-{
-    bool found = false;
-    for (int row = 0; row<BUFFER_WIDTH; row++)
-    {
-        for (int col = 0; col<BUFFER_HEIGHT; col++)
-        {
-            for (int i = 0; i<strlen(chars); i++)
-            {
-                if(_console_buffer[row][col] == chars[i])
-                {
-                    return coords{row,col};
-                }
-            }
-        }
-    }
-    return coords{-1,-1};
-}
+
 

@@ -62,61 +62,12 @@ DisplayManager & DisplayManager::operator = (const DisplayManager & rhs)
 
 void DisplayManager::Display()
 {
-	//SetConsoleActiveScreenBuffer(_secondary_buffer);
-
-	//for (int row = 0; row <BUFFER_HEIGHT; row++)
-	//{
-	//	std::cout << _console_buffer[row] << "\n";
-	//	/*for (int i = 0; i < BUFFER_WIDTH; i++)
-	//	{
-	//	std::cout << _console_buffer[row][i];
-	//	}
-	//	std::cout << "\n";*/
-	//}
-	//std::cout << std::endl;
-
-	
-
-	//mainRect.Top = 0;    // top left: row 0, col 0 
-	//mainRect.Left = 0;
-	//mainRect.Bottom = BUFFER_HEIGHT; // bot. right: row 1, col 79 
-	//mainRect.Right = BUFFER_WIDTH;
-
-	//coordBufSize.Y = BUFFER_HEIGHT;
-	//coordBufSize.X = BUFFER_WIDTH;
-
-	//coordBufCoord.X = 0;
-	//coordBufCoord.Y = 0;
-
-	//ReadConsoleOutput(
-	//	_main_buffer,        // screen buffer to read from 
-	//	_char_info,      // buffer to copy into 
-	//	coordBufSize,   // col-row size of chiBuffer 
-	//	coordBufCoord,  // top left dest. cell in chiBuffer 
-	//	&mainRect);
-
-	//secRect.Top = 0;    // top lt: row 10, col 0 
-	//secRect.Left = 0;
-	//secRect.Bottom = BUFFER_HEIGHT; // bot. rt: row 11, col 79 
-	//secRect.Right = BUFFER_WIDTH;
-	//SetConsoleActiveScreenBuffer(_main_buffer);
 	WriteConsoleOutput(
 		_main_buffer, // screen buffer to write to 
 		_char_info,        // buffer to copy from 
 		coordBufSize,     // col-row size of chiBuffer 
 		coordBufCoord,    // top left src cell in chiBuffer 
 		&secRect);
-
-	
-
-	//WriteConsoleOutput(
-	//	_secondary_buffer, // screen buffer to write to 
-	//	_char_info,        // buffer to copy from 
-	//	coordBufSize,     // col-row size of chiBuffer 
-	//	coordBufCoord,    // top left src cell in chiBuffer 
-	//	&secRect);
-    
-    
 }
 
 void DisplayManager::Fill(const wchar_t * fill)

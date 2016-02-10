@@ -1,10 +1,29 @@
-//
-//  Deck.hpp
-//  FreeCell
-//
-//  Created by Ian Murphy on 2/4/16.
-//  Copyright © 2016 Ian Murphy. All rights reserved.
-//
+/*************************************************************
+* Author:		Ian Murphy
+* Filename:		Deck.hpp
+* Date Created:	2/4/2016
+* Modifications:	2/4/16 - Added documentation
+*
+**************************************************************/
+
+/************************************************************************
+* Class: Deck
+*
+* Purpose: This class implements a stack of cards.  A consumer can draw from the top of the stack like a deck.
+*
+* Manager functions:
+* 	Deck(int size = DECK_SIZE);
+    Deck(const Deck & cp);
+    ~Deck();
+    Deck & operator = (const Deck & rhs);
+*
+* Methods:
+*	Draw()
+	draws and returns a card by value
+	Init()
+		Shuffles the deck based on a provided seed.
+*		...
+*************************************************************************/
 
 #ifndef Deck_hpp
 #define Deck_hpp

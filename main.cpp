@@ -1,14 +1,25 @@
-//
-//  main.cpp
-//  FreeCell
-//
-//  Created by Ian Murphy on 2/2/16.
-//  Copyright © 2016 Ian Murphy. All rights reserved.
-//
+/*************************************************************
+* Author:		Ian Murphy
+* Filename:		main.cpp
+* Date Created:	2/6/2016
+* Modifications:	2/9/2016 - Added documentation
+*
+**************************************************************\
 
-
-
-
+/*************************************************************
+*
+* Lab 3 - FreeCell
+*
+* Overview:
+*	This program allows a user to play freecell in the console.
+*
+* Input:
+*	Input consists of keyboard commands that correspond to certain actions.  The program will alert users to possible inputs and changes to the game state.
+*
+* Output:
+*	The program outputs the state of the freecell gameboard after most inputs.  Output is to the console.
+*
+************************************************************/
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -43,7 +54,7 @@ int main(int argc, const char * argv[]) {
 		}
 		
 	}
-
+	std::wcout << sizeof(Card) << endl;
 	
     return 0;
 }
